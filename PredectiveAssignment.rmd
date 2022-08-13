@@ -1,0 +1,445 @@
+---
+title: "Predective Analysis Assignment 1"
+author: "Aditya Shetty"
+date: "10/29/2021"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+Importing data set shared in Github
+
+```{r}
+df <- read.csv(file = 'E:/UCD/Predective analysis/data_data_set.csv')
+
+df <- data.frame(df)
+```
+
+#### 1. 
+As we checked here numeric values are are already numeric, and converted "Area" & "property.type" into factors.
+
+```{r}
+df$Area = as.factor(df$Area)
+df$property.type = as.factor(df$property.type)
+is.numeric(df$Price)
+is.numeric(df$bathroom)
+is.numeric(df$bedroom)
+
+```
+
+#### 2. 
+As we checked in all columns there is no missing values.
+
+```{r}
+sum(is.na(df$Price))
+sum(is.na(df$bathroom))
+sum(is.na(df$Area))
+sum(is.na(df$bedroom))
+sum(is.na(df$property.type))
+
+```
+
+```{r echo=FALSE}
+library(tidyverse)
+``` 
+
+#### 3. 
+There are 1228 duplicate rows in this database, we are only taking unique rows and using that for further process. After removing duplicated values there are  1185 rows.
+
+```{r}
+df = distinct(df)
+# checking the duplicated values and keeping the last instance
+
+``` 
+
+#### 4. 
+For numeric columns where range is huge and the count can be continuous we can convert the numeric values to range.
+Eg: in our data frame prices of properties can be converted in range such as : 500-1000, 1000-1500, etc. which can be helpful in finding prices in particular bracket or category.
+
+We can transform character to numeric factors which can be helpful to make categories and assign an order.
+
+We can transform date category column to day, month and year which can be helpful to segregate data.
+
+#### 5.
+Range values are not a reliable measure of dispersion. They don't have precision values and cannot be used for calculations.
+Hence converting continuous data to discrete values is a good idea. 
+
+
+#### 6. 
+As we can notice we came to below conclusions
+- The minimum cost of house is 500 in North Dublin City as compared to all the areas, and Dublin City Centre has the second highest minimum house cost of 1550 after Co. Dublin with 3450.
+- The maximum cost of house is 8500 in South Co. Dublin, where in maximum highest cost is 3450 in Co. Dublin.
+- The average cost in a area can be seen by the mean, where in West Co. Dublin has the lowest mean with 2135 for a house and South Co. Dublin tops the mean with 3522.
+- The lowest median cost is in West Co. Dublin with median cost of 2084 for a house and Co. Dublin tops the median with 3450.
+- The 1st and 3rd quantile suggests the majority range for cost in this case for each area, due which we clearly notice that there the diverse range in pricing for houses is the highest in South Co. Dublin .i.e.  the highest IQR with pricing range 2271 and 4200 .
+- As we already noticed that in "Co. Dublin", the minimum cost, maximum cost, median cost, mean are all 3450.
+
+```{r Missing entries}
+Price_House = (df$Price[df$property.type=="House"])
+Area_House = (df$Area[df$property.type=="House"])
+by(Price_House,Area_House,summary)
+
+``` 
+
+#### 7.
+As we can see below, "South Co. Dublin has the highest IQR, that is variety in range for houses, and Co. Dublin has only one cost.
+
+```{r boxplot}
+  par(cex.axis=0.6)
+  boxplot(Price_House~Area_House,
+    xlab = "Area", ylab = "Price",
+    main = "Prices based on Area of House", las=2) 
+```
+
+- As per the below histograms, we can deduce that, all the houses in these areas have majority of houses in the range of 1500-2500.
+- Where in South Dublin City, North Dublin City, North Co. Dublin have majority  of houses in the range of 1500-2000.
+- And South Co. Dublin, Dublin City Center, West Co. Dublin have majority of houses in the range of 1500-2500.
+
+```{r}
+par(mfrow=c(3,2))
+hist(df$Price[df$Area=="South Dublin City" | df$property.type=="House"] , xlab = "South Dublin City", main = "")
+hist(df$Price[df$Area=="South Co. Dublin" | df$property.type=="House"], xlab = "South Co. Dublin", main = "")
+hist(df$Price[df$Area=="Dublin City Centre" | df$property.type=="House"], xlab = "Dublin City Centre", main = "")
+hist(df$Price[df$Area=="North Dublin City" | df$property.type=="House"], xlab = "North Dublin City", main = "")
+hist(df$Price[df$Area=="West Co. Dublin" | df$property.type=="House"], xlab = "West Co. Dublin", main = "")
+hist(df$Price[df$Area=="North Co. Dublin" | df$property.type=="House"], xlab = "North Co. Dublin", main = "")
+hist(df$Price[df$Area=="Co. Dublin" | df$property.type=="House"], xlab = "Co. Dublin", main = "")
+
+
+```
+
+#### 8.
+
+- Histogram is Uni-variate. hence it can only use one parameter and use its frequency.
+- Histogram depends on bins and intervals hence if we can create different, with different bins, which can lead to different results.  
+
+
+
+#### 9.
+
+The below boxplots are for our data, please refer below image general form. 
+
+```{r }
+par(mfrow=c(1,5))
+boxplot(df$Price)
+boxplot(df$Area)
+boxplot(df$bathroom)
+boxplot(df$bedroom)
+boxplot(df$property.type)
+
+summary(df)
+```
+
+![BoxplotImage] (E:/UCD/Predective analysis/Boxplot.jpeg)
+
+#### 10.
+```{r }
+x=seq(4,10,length=100)
+y=dnorm(x,mean=7,sd=1.758272)
+boxplot(x, main='Boxplot of normal population')
+```
+In the above normal distribution we can interpret:
+1. The below the whisker: The below whisker is the data below 0%, and is not included in IQR or the whisker. They are known as lower outliers.
+In this case there are no outliers.
+
+2. whisker to Q1: The data from 0% to 25%(1st quartile) are in the lower whiskers.
+
+3. Q1 to Q3: This is known as IQR also known as Interquartile range and confides of 25% ro 75% of the data. We have median in between of this data.
+
+4. Q3 to whisker: The data from 75% to upper end, or the third part % are in the lower whiskers.
+
+5. above the whisker: The above whisker is the data above the max range, and is not included in IQR or the whisker. They are known as upper outliers.
+In this case there are no outliers.
+
+
+
+11.
+As we can notice with frequency bar-plot, Co. Dublin has the lowest properties and South Dublin City has the highest number of properties, which can be even see in the proportional plot where in  South Dublin City has 35% share among the total properties. 
+
+```{r }
+freq = table(df$Area)
+par(cex.axis=0.6)
+barplot(table(df$Area),las=2)
+
+propotional=prop.table(freq)  #proportion
+par(cex.axis=0.6)
+barplot(propotional,ylim = c(0,0.4),las=2)
+
+```
+12.
+
+As we can notice with frequency bar-plot of property type, that majority of properties are apartments which is 7000 which constitutes almost 50% of the properties as per the proportional bar plot.
+We have very low number of flats compared to other properties.
+
+```{r }
+
+freq = table(df$property.type)
+propotional=prop.table(freq)  #proportion
+
+par(mfrow=c(1,2),cex.axis=0.6)
+barplot(freq)
+barplot(propotional,ylim = c(0,0.4))
+```
+13.
+```{r }
+Price_Apartment_Dublin = df$Price[df$Area=="Dublin City Centre" & df$property.type=="Apartment"]
+
+Bedroom_Apartment_Dublin=df$bedroom[df$Area=="Dublin City Centre" & df$property.type=="Apartment"]
+
+cor(Price_Apartment_Dublin,Bedroom_Apartment_Dublin)
+
+plot(Bedroom_Apartment_Dublin,Price_Apartment_Dublin)
+```
+- We can clearly notice that rates 1 bedroom has the lowest average rates, compared 2 bedrooms and 3 bedrooms have the highest rates.
+- As we can notice our correlation value came as 0.5257073, which means its a positive correlation(also confirming from the plot).
+
+
+14.
+```{r }
+Dublin_City_Centre = df[df$Area=="Dublin City Centre",]
+coplot(Price~bedroom | property.type,data=Dublin_City_Centre)
+
+```
+
+In the above correlation plot, the bottom left chart is for apartment, the bottom right chart is for Flat, top left is for house and top right is for studio. In Apartment, flat and house for bedroom and price we can see a positive correlation but for Studio we can see negative correlation.
+
+
+### Simple Linear Regression
+
+1.
+```{r }
+y=df$Price[df$Area=="Dublin City Centre" & df$property.type=="Apartment"]  
+x=df$bedroom[df$Area=="Dublin City Centre" & df$property.type=="Apartment"]
+
+(lm(y~x))
+summary(lm(y~x))
+plot(x,y)
+abline(lm(y~x))
+
+```
+2.
+
+We know, y = m * x + c
+
+that is : y = beta0 + beta1 * x
+
+Hence our equation is :
+
+Price = 987.3976 + 948.6184*bedroom
+
+
+
+4.
+There are five assumptions associated with a linear regression model:
+
+- Linearity in Parameters: 
+The relationship between X and the mean of Y is linear.
+- Homoscedasticity : 
+The variance of residual is the same for any value of X.
+- Normality : 
+For any fixed value of X, Y is normally distributed and is independent of the error term.
+- Variation in X :
+There is variation in the explanatory variable.
+- Zero conditional mean :
+Expected value of the error term is zero conditional on all values of the fixed value of X,Y.
+```{r }
+par(mfrow=c(2,2))
+plot(lm(y~x))
+```
+8.
+
+beta1 is the approx cost of each bedroom, that is we can assume that is that if we increase bedroom by 1 then cost will increase by '948.6184'.
+
+```{r }
+#Sxx & Sxy are the terms used to calculate intercept
+
+Sxy=sum(x*y)-length(x)*mean(x)*mean(y)
+Sxy
+Sxx=sum(x^2)-length(x)*mean(x)^2
+Sxx
+
+#beta1 is the slope
+
+beta1=Sxy/Sxx
+beta1
+
+```
+
+7.
+
+beta0 is the constant value which is the point where the function crosses the y-axis,
+that mean that if we get a property with no bedrooms even then the cost would be "987.3976".
+```{r }
+# beta0 is the intercept
+
+beta0=mean(y)-beta1*mean(x)
+beta0
+
+```
+
+
+
+10.
+```{r}
+yhat=beta0+beta1*x
+# SSE is error of Sum of Squares 
+SSE=sum((y-yhat)^2)
+SSE
+
+# Mean squared error, this is used for calculating Variance and slope term
+MSE=SSE/(length(y)-2)
+MSE
+
+# var_slope is the variance
+var_slope = MSE/Sxx
+var_slope
+
+# var_intercept is the intercept term
+var_intercept = MSE*(1/length(y)+mean(x)^2/Sxx)
+var_intercept
+
+```
+
+11.
+The standard error in slope is 111.3601. 
+The standard error of slope is the average distance of the observed values that deviate from the regression line. 
+In our case, the average distance of the observed values that deviate from the regression line is 89.83941. 
+
+The standard error of the intercept is 163.3255. 
+The standard error of intercept tells us if the coefficient of the intercept is actually different from zero (hypothesized value). 
+In this case, we are 163 standard errors away from zero approximately.
+```{r }
+# SE_slope is standard error of estimate slope
+
+SE_slope = sqrt(var_slope)
+SE_slope
+
+# SE_intercept is standard error of estimate intercept
+
+SE_intercept = sqrt(var_intercept)
+SE_intercept
+
+
+```
+12.
+We are 95% confident that the value of beta0 lies in between 665.2335 - 1309.5618. i.e. 665.2335  < beta0 < 1309.5618. 
+```{r }
+
+alpha=0.05
+c(beta0 - qt(1-alpha/2,length(y)-2)*sqrt(var_intercept),
+  beta0 + qt(1-alpha/2,length(y)-2)*sqrt(var_intercept))
+# this is the confidence interval of beta0.4
+
+```
+
+13.
+
+We are 95% confident that the value of beta1 lies in between 728.9575 - 1168.2794. i.e. 728.9575  < beta1 < 1168.2794. 
+```{r }
+
+c(beta1 - qt(1-alpha/2,length(y)-2)*sqrt(var_slope),
+  beta1 + qt(1-alpha/2,length(y)-2)*sqrt(var_slope))
+
+# this is the confidence interval of beta1.
+```
+
+14.
+We need to find the t-statistics value for n − 2 = 192 − 2 = 189 degrees of freedom 
+and as we would like 95% confidence then
+α = 1 − 0.95 = 0.05 and t (α/2,189) = t(0.025,189) = 1.972595.
+As |6.045582| > 1.972595 we reject H0. That is we are 95% confident that the true value of beta0 is not zero based off this sample of data.
+
+```{r }
+T0 = (beta0-0)/SE_intercept
+T0
+qt(0.025,189,lower.tail = FALSE)
+```
+15.
+We need to find the t-statistics value for n − 2 = 192 − 2 = 189 degrees of freedom and as we
+would like 95% confidence then
+α = 1 − 0.95 = 0.05 and t(α/2,189) = t(0.025,189) = 1.972595.
+As |8.518478| > 1.972595 we reject H0. That is we are 95% confident that the true value of beta1 is not zero based off this sample of data.
+```{r }
+T1 = (beta1-0)/SE_slope
+T1
+
+qt(0.025,189,lower.tail = FALSE)
+```
+
+
+16.
+```{r }
+summary(lm(y~x))
+SSR = sum((yhat - mean(y))^2)
+SSE = sum((yhat - y)^2)
+MSR = SSR
+MSE = SSE/(length(y)-2)
+F = MSR/MSE
+F
+qf(1-alpha,1,length(y)-2)
+```
+The probability that the F-distribution takes a value of 72.56446 with p- value of 4.894e-15 . Which is much less than 0.05, hence we reject the hypothesis. This indicates that there is a relation between bedrooms and prices.
+
+17.
+```{r }
+SST=sum((y-mean(y))^2)
+SST
+SSR=SST-SSE
+R2=SSR/SST
+R2
+```
+The R2 value as shown in the summary statistics is 0.2763682. This means roughly 27% of the data fits the regression model. In other words, 27% of the variation in the price of apartments is explained by the number of bedrooms in the apartment of Dublin City Center. 
+
+
+18.
+```{r }
+
+RSE = sqrt(SSE/length(y)-2)
+RSE
+```
+The residual standard error is 804.5349. This tells us that the monthly rent of an apartment in Dublin City Centre can deviate from the true regression line by 804.5349. 
+
+# QUestion19.
+
+```{r }
+dublin_city_centre_apartment=df[df$property.type=='Apartment'& df$Area=='Dublin City Centre',c(1,3,4)]
+
+SXX = sum((x - mean(x))^2)
+var_Y = MSE*(1/length(y) + (x-mean(y))^2/Sxx)
+s=sort(dublin_city_centre_apartment$bedroom,index.return = TRUE)
+ind= s$ix
+UCI= yhat + qt(1-alpha/2,length(y)-2)*sqrt(var_Y)
+LCI= yhat- qt(1-alpha/2,length(y)-2)*sqrt(var_Y)
+plot(dublin_city_centre_apartment$bedroom,dublin_city_centre_apartment$Price,xlab="Number of Bedrooms",ylab="Price")
+lines(dublin_city_centre_apartment$bedroom[ind],yhat[ind], col="yellow")
+lines(dublin_city_centre_apartment$bedroom[ind],UCI[ind],col="red")
+lines(dublin_city_centre_apartment$bedroom[ind],LCI[ind],col="red") 
+
+
+```
+The upper and lower confidence interval are closer to true line for bedroom=1 and moves further away as it proceeds in regression line in bedroom=2 and 3. 
+
+# Question 20.
+
+```{r }
+X_new=as.matrix(c(3,2,1,1,1,2,3,4,2,2,3,3))
+var_E= MSE*(1 + 1/length(y) + (X_new-mean(x))^2/Sxx)
+YP = beta0 + beta1*X_new
+cbind(YP- qt(1-alpha/2,length(y)-2)*sqrt(var_E),YP + qt(1-alpha/2,length(y)-2)*sqrt(var_E))
+
+plot(dublin_city_centre_apartment$bedroom,dublin_city_centre_apartment$Price,xlab="Bedroom",ylab="Price")
+lines(X_new,YP,col="yellow")
+lines(X_new,YP+qt(1-alpha/2,length(y)-2)*sqrt(var_E),col="red")
+lines(X_new,YP-qt(1-alpha/2,length(y)-2)*sqrt(var_E),col="red")
+
+
+```
+
+At 95% of the values predicted for price based on the number of bedrooms will lie in between the upper and lower red lines around the regression line. The prediction interval is constant around the regression line. 
